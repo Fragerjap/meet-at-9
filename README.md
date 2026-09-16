@@ -1,4 +1,4 @@
-# Meet-at-9
+# Meet at 9
 Meeting organizer app (raw AS IS for self-host)
 
 Greetings! One day I needed to coordinate day/time for a meeting for several users with zero hussle.
