@@ -1,0 +1,391 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: meeting
+    description: Meeting grid sync operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /meeting/grid:
+    get:
+      operationId: getMeetingGrid
+      tags: [meeting]
+      summary: Get full meeting grid state
+      responses:
+        "200":
+          description: Current grid state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingGrid"
+
+  /meeting/cell:
+    post:
+      operationId: setMeetingCell
+      tags: [meeting]
+      summary: Set a single cell value
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetCellRequest"
+      responses:
+        "200":
+          description: Updated grid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingGrid"
+
+  /meeting/range:
+    post:
+      operationId: setMeetingRange
+      tags: [meeting]
+      summary: Color a range of hours for one user in one day
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetRangeRequest"
+      responses:
+        "200":
+          description: Updated grid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingGrid"
+
+  /meeting/user-names:
+    get:
+      operationId: getMeetingUserNames
+      tags: [meeting]
+      summary: Get display names for all users
+      responses:
+        "200":
+          description: Current user names
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingUserNames"
+
+  /meeting/user-skip:
+    post:
+      operationId: setMeetingUserSkip
+      tags: [meeting]
+      summary: Set skip status for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetUserSkipRequest"
+      responses:
+        "200":
+          description: Updated names and skip status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingUserNames"
+
+  /meeting/user-name:
+    post:
+      operationId: setMeetingUserName
+      tags: [meeting]
+      summary: Set the display name for a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetUserNameRequest"
+      responses:
+        "200":
+          description: Updated user names
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingUserNames"
+
+  /meeting/labels:
+    get:
+      operationId: getMeetingLabels
+      tags: [meeting]
+      summary: Get current day column labels
+      responses:
+        "200":
+          description: Current labels
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingLabels"
+
+  /meeting/label:
+    post:
+      operationId: setMeetingLabel
+      tags: [meeting]
+      summary: Set the label for a day column
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetLabelRequest"
+      responses:
+        "200":
+          description: Updated labels
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingLabels"
+
+  /meeting/config:
+    get:
+      operationId: getMeetingConfig
+      tags: [meeting]
+      summary: Get shared meeting configuration (start time, step)
+      responses:
+        "200":
+          description: Current config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingConfigPayload"
+    post:
+      operationId: setMeetingConfig
+      tags: [meeting]
+      summary: Set shared meeting configuration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetMeetingConfigRequest"
+      responses:
+        "200":
+          description: Updated config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingConfigPayload"
+
+  /meeting/description:
+    get:
+      operationId: getMeetingDescription
+      tags: [meeting]
+      summary: Get the meeting description text
+      responses:
+        "200":
+          description: Current description
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingDescriptionPayload"
+    post:
+      operationId: setMeetingDescription
+      tags: [meeting]
+      summary: Set the meeting description text
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetDescriptionRequest"
+      responses:
+        "200":
+          description: Updated description
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingDescriptionPayload"
+
+  /meeting/clear:
+    post:
+      operationId: clearMeetingUser
+      tags: [meeting]
+      summary: Clear all cells for a specific user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClearUserRequest"
+      responses:
+        "200":
+          description: Cleared grid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MeetingGrid"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    MeetingCell:
+      type: object
+      properties:
+        day:
+          type: string
+        hour:
+          type: integer
+        userId:
+          type: string
+        colored:
+          type: boolean
+      required: [day, hour, userId, colored]
+
+    MeetingGrid:
+      type: object
+      properties:
+        cells:
+          type: array
+          items:
+            $ref: "#/components/schemas/MeetingCell"
+      required: [cells]
+
+    SetCellRequest:
+      type: object
+      properties:
+        day:
+          type: string
+        hour:
+          type: integer
+        userId:
+          type: string
+        colored:
+          type: boolean
+      required: [day, hour, userId, colored]
+
+    SetRangeRequest:
+      type: object
+      properties:
+        day:
+          type: string
+        minHour:
+          type: integer
+        maxHour:
+          type: integer
+        userId:
+          type: string
+      required: [day, minHour, maxHour, userId]
+
+    MeetingUserNames:
+      type: object
+      properties:
+        names:
+          type: object
+          additionalProperties:
+            type: string
+        skipped:
+          type: object
+          additionalProperties:
+            type: boolean
+      required: [names, skipped]
+
+    SetUserSkipRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        skipped:
+          type: boolean
+      required: [userId, skipped]
+
+    SetUserNameRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+        name:
+          type: string
+      required: [userId, name]
+
+    MeetingLabels:
+      type: object
+      properties:
+        labels:
+          type: array
+          items:
+            type: string
+      required: [labels]
+
+    SetLabelRequest:
+      type: object
+      properties:
+        columnIndex:
+          type: integer
+        label:
+          type: string
+      required: [columnIndex, label]
+
+    MeetingConfigPayload:
+      type: object
+      properties:
+        startHour:
+          type: integer
+        startMinute:
+          type: integer
+        halfHourStep:
+          type: boolean
+      required: [startHour, startMinute, halfHourStep]
+
+    SetMeetingConfigRequest:
+      type: object
+      properties:
+        startHour:
+          type: integer
+        startMinute:
+          type: integer
+        halfHourStep:
+          type: boolean
+      required: [startHour, startMinute, halfHourStep]
+
+    MeetingDescriptionPayload:
+      type: object
+      properties:
+        description:
+          type: string
+      required: [description]
+
+    SetDescriptionRequest:
+      type: object
+      properties:
+        description:
+          type: string
+      required: [description]
+
+    ClearUserRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+      required: [userId]
+
