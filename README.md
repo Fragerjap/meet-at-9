@@ -13,3 +13,4 @@ It's shared as-is and PRs are very welcome!
 
 You can ask me for a deployed app link to check the working example, if you want to contribute or use it.
 (I don't post it publically 'cos there is no RLS in database by design.)
+I may also invite you to be a Replit project collaborator, as this is not my stack at all.
